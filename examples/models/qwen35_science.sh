@@ -10,20 +10,22 @@ MODEL='Qwen/Qwen3.5-9B'
 #TASKS='mathvision_test,mathverse_testmini_vision_dominant'
 #TASKS='scienceqa,rxnbench_vqa,MolParse,OpenRxn,EMVista,superchem_en,SmolInstruct,ProteinLMBench,sfe-en,microvqa,msearth_mcq,xlrs-lite'
 # MolParse 성공
-# TASKS='MolParse,OpenRxn'
-TASKS='OpenRxn'
+# TASKS='MolParse,OpenRxn,rxnbench_vqa,scienceqa,EMVista,microvqa,msearth_mcq,xlrs-lite'
+TASKS='xlrs-lite'
 MAX_PIXELS=$((2048 * 32 * 32))
 MIN_PIXELS=$((256 * 32 * 32))
 MAX_NUM_FRAMES=1
 BATCH_SIZE=8
 MAX_NEW_TOKENS=2048
 
-uv run accelerate launch --num_processes=2 --main_process_port=12346 -m lmms_eval \
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True uv run accelerate launch --num_processes=2 --main_process_port=12346 -m lmms_eval \
     --model qwen3_5 \
     --model_args pretrained=$MODEL,max_pixels=$MAX_PIXELS,min_pixels=$MIN_PIXELS,max_frames=$MAX_NUM_FRAMES,enable_thinking=false  \
     --gen_kwargs max_new_tokens=$MAX_NEW_TOKENS,temperature=0.7,top_p=0.8,top_k=20,repetition_penalty=1.0 \
     --tasks $TASKS \
-    --limit 5 \
     --log_samples \
     --output_path ./logs/ \
     --batch_size $BATCH_SIZE
+    
+
+#--limit 5 \

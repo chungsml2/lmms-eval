@@ -74,7 +74,12 @@ dependencies = [
     "python-dotenv",
     "qwen-vl-utils>=0.0.14",
     "math-verify",
+    "causal-conv1d",
+    "flash-linear-attention",
     "decord",
+    "rouge_score",     # for sfe-en
+    "bert_score",
+    "pymeteor",
 ]
 
 [project.optional-dependencies]
@@ -208,6 +213,14 @@ dev = [
     "textual>=7.2.0",
     "textual-dev>=1.8.0",
 ]
+
+[tool.uv.sources]
+pymeteor = { index = "test" }
+
+[[tool.uv.index]]
+name = "test"
+url = "https://test.pypi.org/simple/"
+explicit = true
 
 [tool.pytest.ini_options]
 testpaths = ["test"]

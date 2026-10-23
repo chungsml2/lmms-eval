@@ -51,6 +51,20 @@ def rxnbench_doc_to_text(doc, lmms_eval_specific_kwargs=None):
 def _get_target(doc):
     return ["A", "B", "C", "D"][int(doc["answer"])]
 
+
+# [ADDED]
+# Processing \boxed format output
+_BOXED_RE = re.compile(r"\\boxed\{\s*\(?([A-Da-d])\)?")
+_LETTER_RE = re.compile(r"\b([A-D])\b")
+
+# [ADDED]
+def _extract_choice(pred):
+    boxed = _BOXED_RE.findall(pred)
+    if boxed:
+        return boxed[-1].lower()
+    match = _LETTER_RE.search(pred)
+    return match.group(1).lower() if match else ""
+
 def rxnbench_process_results(doc, results):
     raw_pred = results[0] if results else ""
 
@@ -62,10 +76,10 @@ def rxnbench_process_results(doc, results):
     if pred.lower() == target:
         score = 1.0
     else:
-        match = re.search(r"([A-D])", pred, re.IGNORECASE)
-        if match and match.group(1).lower() == target:
+        # [ADDED]
+        if _extract_choice(pred) == target:
             score = 1.0
-
+        
     prompt_text = rxnbench_doc_to_text(doc)
     
     return {
@@ -73,3 +87,4 @@ def rxnbench_process_results(doc, results):
         "raw_output": raw_pred,
         "question": prompt_text
     }
+
